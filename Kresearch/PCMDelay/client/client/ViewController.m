@@ -34,6 +34,7 @@ typedef NS_ENUM(int32_t, ProtocolType) {
 @end
 
 const int port = 51515;
+static char uint8_t[1024 * 10 * 8];
 
 @implementation ViewController
 
@@ -107,15 +108,16 @@ const int port = 51515;
            fromPeer:(MCPeerID *)peerID {
     if (self.mSession == session) {
         NSLog(@"didReceiveStream:%@, named:%@ from id:%@", [stream description], streamName, peerID.displayName);
-//
-//        if (self.mInputStream) {
-//            [self.mInputStream close];
-//            self.mInputStream = nil;
-//        }
+        
         self.mInputStream = stream;
         self.mInputStream.delegate = self;
         [self.mInputStream scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
         [self.mInputStream open];
+        
+        self.mOutputStream = [self.mSession startStreamWithName:@"delayTestClient" toPeer:[self.mSession.connectedPeers firstObject] error:nil];
+        self.mOutputStream.delegate = self;
+        [self.mOutputStream scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
+        [self.mOutputStream open];
     }
 }
 
@@ -181,23 +183,20 @@ const int port = 51515;
         case NSStreamEventHasBytesAvailable:{//监测到输入流通道中有数据流，就把数据一点一点的拼接起来
             NSLog(@"NSStreamEventHasBytesAvailable");
             if (aStream == self.mInputStream) {
-                ProtocolType type = 0;
-                NSInteger length = [self.mInputStream read:(uint8_t *)(&type) maxLength:4];
-                NSLog(@"read %ld, type:%d", length, type);
-                [self handleProtocolWithType:type data:NULL];
+                NSInteger length = [self.mInputStream read:buffer maxLength:sizeof(buffer)];
+                NSLog(@"read length: %ld", length);
+                
+                [self.mOutputStream write:buffer maxLength:length];
             }
             break;
         }
         case NSStreamEventHasSpaceAvailable: {//监测到有内存空间可用，就把输出流通道中的流写入到内存空间
             NSLog(@"NSStreamEventHasSpaceAvailable");
-            if (self.mOutputStream == aStream) {
-            }
+            
         }
             break;
         case NSStreamEventEndEncountered: { //监测到输出流通道中的流数据写入内存空间完成或者输入流通道中的流数据获取完成
             NSLog(@"NSStreamEventEndEncountered");
-            [aStream close];//关闭输出流
-            [aStream removeFromRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];//将输出流从runloop中清除
             
         }
             break;
@@ -219,19 +218,6 @@ const int port = 51515;
     }
 }
 
-- (void)handleProtocolWithType:(ProtocolType)type data:(char *)data {
-    if (!self.mOutputStream) {
-        self.mOutputStream = [self.mSession startStreamWithName:@"delayTestClient" toPeer:[self.mSession.connectedPeers firstObject] error:nil];
-        self.mOutputStream.delegate = self;
-        [self.mOutputStream scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
-        self.mProtocolType = ProtocolTypeDelay;
-        [self.mOutputStream open];
-    }
-    if (type == ProtocolTypeDelayReq || YES) {
-        int32_t type = ProtocolTypeDelayReq;
-        [self.mOutputStream write:(uint8_t *)&type maxLength:4];
-    }
-}
 #pragma mark - ui
 
 - (void)startServer {
