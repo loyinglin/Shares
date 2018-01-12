@@ -10,6 +10,7 @@
 #import <MultipeerConnectivity/MultipeerConnectivity.h>
 #import <AudioUnit/AudioUnit.h>
 #import <AVFoundation/AVFoundation.h>
+#import "LYPlayer.h"
 
 
 typedef NS_ENUM(int32_t, ProtocolType) {
@@ -40,7 +41,7 @@ typedef NS_ENUM(int32_t, ProtocolType) {
 
 @end
 
-const int port = 51515;
+static const int port = 51515;
 
 @implementation ViewController
 {
@@ -48,6 +49,8 @@ const int port = 51515;
     AudioBufferList *buffList;
     
     NSInputStream *inputSteam;
+    
+    LYPlayer *player;
 }
 
 - (void)viewDidLoad {
@@ -95,6 +98,8 @@ const int port = 51515;
     
     self.mAdvertiserAssistant = [[MCAdvertiserAssistant alloc] initWithServiceType:@"connect" discoveryInfo:nil session:self.mSession];
     self.mAdvertiserAssistant.delegate = self;
+    
+
 }
 
 #pragma mark - MCSessionDelegate
@@ -132,13 +137,16 @@ const int port = 51515;
     if (self.mSession == session) {
         NSLog(@"didReceiveStream:%@, named:%@ from id:%@", [stream description], streamName, peerID.displayName);
         
-        if (self.mInputStream) {
-            [self.mInputStream close];
-        }
-        self.mInputStream = stream;
-        self.mInputStream.delegate = self;
-        [self.mInputStream scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
-        [self.mInputStream open];
+//        self.mInputStream = stream;
+//        self.mInputStream.delegate = self;
+//        [self.mInputStream scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
+//        [self.mInputStream open];
+        
+        player = [[LYPlayer alloc] init];
+        player.mInputStream = stream;
+        [stream open];
+        //        [self.mInputStream scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
+        [player play];
     }
 }
 
@@ -199,77 +207,6 @@ const int port = 51515;
     return YES;
 }
 
-#pragma mark -- NSStreamDelegate
-/**
- *  流数据操作
- *
- *  @param aStream   流数据
- *  @param eventCode 流数据获取事件
- */
-- (void)stream:(NSStream *)aStream handleEvent:(NSStreamEvent)eventCode {
-    switch (eventCode) {
-        case NSStreamEventOpenCompleted:{ //打开输出数据流通道或者打开输入数据流通道就会走到这一步
-            NSLog(@"NSStreamEventOpenCompleted");
-        }
-            break;
-        case NSStreamEventHasBytesAvailable:{//监测到输入流通道中有数据流，就把数据一点一点的拼接起来
-            NSLog(@"NSStreamEventHasBytesAvailable");
-            if (aStream == self.mInputStream) {
-                ProtocolType type = 0;
-                uint8_t buffer[1024] = {0};
-                int num = (int)[self.mInputStream read:buffer maxLength:4];
-                NSLog(@"read %d", num);
-                type = *(int32_t *)buffer;
-                NSLog(@"type %d", type);
-                [self handleProtocolWithType:type data:NULL];
-            }
-            break;
-        }
-        case NSStreamEventHasSpaceAvailable: {//监测到有内存空间可用，就把输出流通道中的流写入到内存空间
-            NSLog(@"NSStreamEventHasSpaceAvailable");
-//            if (self.mOutputStream == aStream) {
-//                if (self.mProtocolType == ProtocolTypeDelay) {
-//                    self.mProtocolType = ProtocolTypeNone;
-//                    int32_t type = ProtocolTypeDelayReq;
-//                    [self.mOutputStream write:(uint8_t *)&type maxLength:4];
-//                }
-//            }
-        }
-            break;
-        case NSStreamEventEndEncountered: { //监测到输出流通道中的流数据写入内存空间完成或者输入流通道中的流数据获取完成
-            NSLog(@"NSStreamEventEndEncountered");
-            break;
-        }
-        case NSStreamEventErrorOccurred:{
-            //发生错误
-            NSLog(@"NSStreamEventErrorOccurred");
-            if (aStream == self.mInputStream) {
-                self.mInputStream = nil;
-            }
-            if (aStream == self.mOutputStream) {
-                self.mOutputStream = nil;
-            }
-            [aStream close];//关闭输出流
-            [aStream removeFromRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];//将输出流从runloop中清除
-
-            
-        }
-            break;
-        default:
-            break;
-    }
-}
-
-- (void)handleProtocolWithType:(ProtocolType)type data:(char *)data {
-    if (type == ProtocolTypeDelayRsp || YES) {
-        NSDate *rspDate = [ NSDate dateWithTimeIntervalSinceNow:0];
-        NSTimeInterval delay = [rspDate timeIntervalSinceDate:self.mDelayStartDate];
-        self.averageDelayTime += delay * 1000;
-        ++self.count;
-        NSLog(@"delay test with %.2lfms,  average delay time:%.2lfms", delay * 1000, self.averageDelayTime / (self.count > 0 ? self.count : 1));
-        
-    }
-}
 #pragma mark - ui
 - (void)startServer {
     [self.mAdvertiserAssistant start];
@@ -296,21 +233,17 @@ const int port = 51515;
     
     if (!self.mOutputStream) {
         self.mOutputStream = [self.mSession startStreamWithName:@"delayTestServer" toPeer:[self.mSession.connectedPeers firstObject] error:nil];
-        self.mOutputStream.delegate = self;
-        [self.mOutputStream scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
-        self.mProtocolType = ProtocolTypeDelay;
+//        [self.mOutputStream scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
         [self.mOutputStream open];
     }
-
-    int32_t type = ProtocolTypeDelayReq;
-    [self.mOutputStream write:(uint8_t *)&type maxLength:4];
-
+    
+    [self play];
 }
 
 
 #pragma mark - player
 
-const uint32_t CONST_BUFFER_SIZE = 0x10000;
+static const uint32_t CONST_BUFFER_SIZE = 0x10000;
 
 #define INPUT_BUS 1
 #define OUTPUT_BUS 0
@@ -430,8 +363,9 @@ static OSStatus PlayCallback(void *inRefCon,
                              AudioBufferList *ioData) {
     ViewController *player = (__bridge ViewController *)inRefCon;
     
-    ioData->mBuffers[0].mDataByteSize = (UInt32)[player->inputSteam read:ioData->mBuffers[0].mData maxLength:(NSInteger)ioData->mBuffers[0].mDataByteSize];;
-    NSLog(@"out size: %d", ioData->mBuffers[0].mDataByteSize);
+    ioData->mBuffers[0].mDataByteSize = (UInt32)[player->inputSteam read:ioData->mBuffers[0].mData maxLength:(NSInteger)ioData->mBuffers[0].mDataByteSize];
+    [player->_mOutputStream write:ioData->mBuffers[0].mData maxLength:ioData->mBuffers[0].mDataByteSize];
+    NSLog(@"out size local: %d", ioData->mBuffers[0].mDataByteSize);
     
     if (ioData->mBuffers[0].mDataByteSize <= 0) {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -444,6 +378,10 @@ static OSStatus PlayCallback(void *inRefCon,
 
 - (void)stop {
     AudioOutputUnitStop(audioUnit);
+    if (player) {
+        [player stop];
+        player = nil;
+    }
     if (buffList != NULL) {
         if (buffList->mBuffers[0].mData) {
             free(buffList->mBuffers[0].mData);

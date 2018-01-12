@@ -14,6 +14,7 @@
 		FD54826320046344005B252F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FD54826220046344005B252F /* Assets.xcassets */; };
 		FD54826620046344005B252F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FD54826420046344005B252F /* LaunchScreen.storyboard */; };
 		FD54826920046344005B252F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = FD54826820046344005B252F /* main.m */; };
+		FDBB90192008A36700B7F061 /* LYPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = FDBB90182008A36700B7F061 /* LYPlayer.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,8 @@
 		FD54826520046344005B252F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		FD54826720046344005B252F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FD54826820046344005B252F /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		FDBB90172008A36700B7F061 /* LYPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LYPlayer.h; sourceTree = "<group>"; };
+		FDBB90182008A36700B7F061 /* LYPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LYPlayer.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +63,8 @@
 		FD54825820046344005B252F /* server */ = {
 			isa = PBXGroup;
 			children = (
+				FDBB90172008A36700B7F061 /* LYPlayer.h */,
+				FDBB90182008A36700B7F061 /* LYPlayer.m */,
 				FD2C7B4720086581000E0355 /* abc.pcm */,
 				FD54825920046344005B252F /* AppDelegate.h */,
 				FD54825A20046344005B252F /* AppDelegate.m */,
@@ -149,6 +154,7 @@
 				FD54825E20046344005B252F /* ViewController.m in Sources */,
 				FD54826920046344005B252F /* main.m in Sources */,
 				FD54825B20046344005B252F /* AppDelegate.m in Sources */,
+				FDBB90192008A36700B7F061 /* LYPlayer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

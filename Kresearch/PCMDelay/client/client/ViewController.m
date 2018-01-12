@@ -34,7 +34,7 @@ typedef NS_ENUM(int32_t, ProtocolType) {
 @end
 
 const int port = 51515;
-static char uint8_t[1024 * 10 * 8];
+static u_int8_t buffer[1024 * 10 * 8];
 
 @implementation ViewController
 
@@ -181,7 +181,7 @@ static char uint8_t[1024 * 10 * 8];
         }
             break;
         case NSStreamEventHasBytesAvailable:{//监测到输入流通道中有数据流，就把数据一点一点的拼接起来
-            NSLog(@"NSStreamEventHasBytesAvailable");
+//            NSLog(@"NSStreamEventHasBytesAvailable");
             if (aStream == self.mInputStream) {
                 NSInteger length = [self.mInputStream read:buffer maxLength:sizeof(buffer)];
                 NSLog(@"read length: %ld", length);
@@ -191,7 +191,7 @@ static char uint8_t[1024 * 10 * 8];
             break;
         }
         case NSStreamEventHasSpaceAvailable: {//监测到有内存空间可用，就把输出流通道中的流写入到内存空间
-            NSLog(@"NSStreamEventHasSpaceAvailable");
+//            NSLog(@"NSStreamEventHasSpaceAvailable");
             
         }
             break;
