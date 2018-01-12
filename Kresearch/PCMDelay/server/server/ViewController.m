@@ -266,6 +266,9 @@ static const uint32_t CONST_BUFFER_SIZE = 0x10000;
 
 
 - (void)initPlayer {
+    player = [[LYPlayer alloc] init];
+    [player play];
+    
     // open pcm stream
     NSURL *url = [[NSBundle mainBundle] URLForResource:@"abc" withExtension:@"pcm"];
     inputSteam = [NSInputStream inputStreamWithURL:url];

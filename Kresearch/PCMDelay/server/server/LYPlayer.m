@@ -132,11 +132,12 @@ static OSStatus PlayCallback(void *inRefCon,
     uint32_t length = ioData->mBuffers[0].mDataByteSize;
     if (inputStream.hasBytesAvailable) {
         ioData->mBuffers[0].mDataByteSize = (UInt32)[inputStream read:ioData->mBuffers[0].mData maxLength:(NSInteger)ioData->mBuffers[0].mDataByteSize];
+        NSLog(@"out size player: %d", ioData->mBuffers[0].mDataByteSize);
     }
     else {
         ioData->mBuffers[0].mDataByteSize = length;
+        NSLog(@"out size player: %d", 0);
     }
-    NSLog(@"out size player: %d", ioData->mBuffers[0].mDataByteSize);
     
     if (ioData->mBuffers[0].mDataByteSize <= 0) {
 //        dispatch_async(dispatch_get_main_queue(), ^{
