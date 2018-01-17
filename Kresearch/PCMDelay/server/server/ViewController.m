@@ -33,6 +33,8 @@ typedef NS_ENUM(int32_t, ProtocolType) {
 @property (nonatomic, strong) NSInputStream *mInputStream;
 @property (nonatomic, strong) NSOutputStream *mOutputStream;
 
+@property (nonatomic, strong) NSOutputStream *mLogStream;
+
 @property (nonatomic, assign) int mProtocolType;
 @property (nonatomic, strong) NSDate *mDelayStartDate;
 
@@ -147,6 +149,8 @@ static const int port = 51515;
         [stream open];
         //        [self.mInputStream scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
         [player play];
+        
+        [self play];
     }
 }
 
@@ -236,8 +240,6 @@ static const int port = 51515;
 //        [self.mOutputStream scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
         [self.mOutputStream open];
     }
-    
-    [self play];
 }
 
 
@@ -266,8 +268,18 @@ static const uint32_t CONST_BUFFER_SIZE = 0x10000;
 
 
 - (void)initPlayer {
-    player = [[LYPlayer alloc] init];
-    [player play];
+    
+    NSDate *currentDate = [NSDate date];
+    //用于格式化NSDate对象
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    //设置格式：zzz表示时区
+    [dateFormatter setDateFormat:@"yyyy_MM_dd_HH_mm_ss"];
+    //NSDate转NSString
+    NSString *currentDateString = [dateFormatter stringFromDate:currentDate];
+    self.mLogStream = [[NSOutputStream alloc] initToFileAtPath:[NSString stringWithFormat:@"%@/Documents/%@mLocalVoiceStream.pcm", NSHomeDirectory(), currentDateString] append:NO];
+    [self.mLogStream open];
+    
+    
     
     // open pcm stream
     NSURL *url = [[NSBundle mainBundle] URLForResource:@"abc" withExtension:@"pcm"];
@@ -369,6 +381,7 @@ static OSStatus PlayCallback(void *inRefCon,
     ioData->mBuffers[0].mDataByteSize = (UInt32)[player->inputSteam read:ioData->mBuffers[0].mData maxLength:(NSInteger)ioData->mBuffers[0].mDataByteSize];
     [player->_mOutputStream write:ioData->mBuffers[0].mData maxLength:ioData->mBuffers[0].mDataByteSize];
     NSLog(@"out size local: %d", ioData->mBuffers[0].mDataByteSize);
+    [player->_mLogStream write:ioData->mBuffers[0].mData maxLength:ioData->mBuffers[0].mDataByteSize];
     
     if (ioData->mBuffers[0].mDataByteSize <= 0) {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -385,6 +398,7 @@ static OSStatus PlayCallback(void *inRefCon,
         [player stop];
         player = nil;
     }
+    
     if (buffList != NULL) {
         if (buffList->mBuffers[0].mData) {
             free(buffList->mBuffers[0].mData);
@@ -395,6 +409,9 @@ static OSStatus PlayCallback(void *inRefCon,
     }
     
     [inputSteam close];
+    [self.mLogStream close];
+    [self.mOutputStream close];
+    self.mOutputStream = nil;
 }
 
 - (void)dealloc {

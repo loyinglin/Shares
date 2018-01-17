@@ -20,10 +20,22 @@ static const uint32_t CONST_BUFFER_SIZE = 0x10000;
 {
     AudioUnit audioUnit;
     AudioBufferList *buffList;
+    NSOutputStream *outputStream;
     
 }
 
 - (void)play {
+    NSDate *currentDate = [NSDate date];
+    //用于格式化NSDate对象
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    //设置格式：zzz表示时区
+    [dateFormatter setDateFormat:@"yyyy_MM_dd_HH_mm_ss"];
+    //NSDate转NSString
+    NSString *currentDateString = [dateFormatter stringFromDate:currentDate];
+    outputStream = [[NSOutputStream alloc] initToFileAtPath:[NSString stringWithFormat:@"%@/Documents/%@mSourceVoiceStream.pcm", NSHomeDirectory(), currentDateString] append:NO];
+    [outputStream open];
+    
+    
     [self initPlayer];
     AudioOutputUnitStart(audioUnit);
 }
@@ -136,7 +148,7 @@ static OSStatus PlayCallback(void *inRefCon,
     }
     else {
         ioData->mBuffers[0].mDataByteSize = length;
-        NSLog(@"out size player: %d", 0);
+        NSLog(@"out size player1: %d", 0);
     }
     
     if (ioData->mBuffers[0].mDataByteSize <= 0) {
@@ -144,6 +156,7 @@ static OSStatus PlayCallback(void *inRefCon,
 //            [player stop];
 //        });
     }
+    [player->outputStream write:ioData->mBuffers[0].mData maxLength:ioData->mBuffers[0].mDataByteSize];
     return noErr;
 }
 

@@ -197,7 +197,14 @@ static u_int8_t buffer[1024 * 10 * 8];
             break;
         case NSStreamEventEndEncountered: { //监测到输出流通道中的流数据写入内存空间完成或者输入流通道中的流数据获取完成
             NSLog(@"NSStreamEventEndEncountered");
-            
+            if (aStream == self.mInputStream) {
+                self.mInputStream = nil;
+            }
+            if (aStream == self.mOutputStream) {
+                self.mOutputStream = nil;
+            }
+            [aStream close];//关闭输出流
+            [aStream removeFromRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];//将输出流从runloop中清除
         }
             break;
         case NSStreamEventErrorOccurred:{
