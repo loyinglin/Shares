@@ -139,18 +139,13 @@ static const int port = 51515;
     if (self.mSession == session) {
         NSLog(@"didReceiveStream:%@, named:%@ from id:%@", [stream description], streamName, peerID.displayName);
         
-//        self.mInputStream = stream;
-//        self.mInputStream.delegate = self;
-//        [self.mInputStream scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
-//        [self.mInputStream open];
-        
         player = [[LYPlayer alloc] init];
         player.mInputStream = stream;
         [stream open];
-        //        [self.mInputStream scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
+        [self play];
+        
         [player play];
         
-        [self play];
     }
 }
 
