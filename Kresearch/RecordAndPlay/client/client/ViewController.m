@@ -37,6 +37,10 @@ const int port = 51515;
 static u_int8_t buffer[1024 * 10 * 8];
 
 @implementation ViewController
+{
+    NSOutputStream *mLogInputStream;
+    NSOutputStream *mLogOutputStream;
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -118,6 +122,22 @@ static u_int8_t buffer[1024 * 10 * 8];
         self.mOutputStream.delegate = self;
         [self.mOutputStream scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
         [self.mOutputStream open];
+        
+        [[NSFileManager defaultManager] createDirectoryAtPath:[NSHomeDirectory() stringByAppendingPathComponent:@"Documents/KSongKit"] withIntermediateDirectories:NO attributes:nil error:nil];
+        NSDate *currentDate = [NSDate date];
+        //用于格式化NSDate对象
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        //设置格式：zzz表示时区
+        [dateFormatter setDateFormat:@"yyyy_MM_dd_HH_mm_ss"];
+        //NSDate转NSString
+        NSString *currentDateString = [dateFormatter stringFromDate:currentDate];
+        mLogInputStream = [[NSOutputStream alloc] initToFileAtPath:[NSString stringWithFormat:@"%@/Documents/KSongKit/%@mLogInputStream.pcm", NSHomeDirectory(), currentDateString] append:NO];
+        [mLogInputStream open];
+        
+        mLogOutputStream = [[NSOutputStream alloc] initToFileAtPath:[NSString stringWithFormat:@"%@/Documents/KSongKit/%@mLogOutputStream.pcm", NSHomeDirectory(), currentDateString] append:NO];
+        [mLogOutputStream open];
+        
+        NSLog(@"###Multipeer###, prepare output:%@", [NSHomeDirectory() stringByAppendingPathComponent:@"Documents/KSongKit"]);
     }
 }
 
@@ -181,17 +201,19 @@ static u_int8_t buffer[1024 * 10 * 8];
         }
             break;
         case NSStreamEventHasBytesAvailable:{//监测到输入流通道中有数据流，就把数据一点一点的拼接起来
-//            NSLog(@"NSStreamEventHasBytesAvailable");
+            NSLog(@"NSStreamEventHasBytesAvailable");
             if (aStream == self.mInputStream) {
                 NSInteger length = [self.mInputStream read:buffer maxLength:sizeof(buffer)];
                 NSLog(@"read length: %ld", length);
+                [mLogInputStream write:(const unsigned char *)buffer maxLength:length];
                 
-                [self.mOutputStream write:buffer maxLength:length];
+                length = [self.mOutputStream write:buffer maxLength:length];
+                [mLogOutputStream write:(const unsigned char *)buffer maxLength:length];
             }
             break;
         }
         case NSStreamEventHasSpaceAvailable: {//监测到有内存空间可用，就把输出流通道中的流写入到内存空间
-//            NSLog(@"NSStreamEventHasSpaceAvailable");
+            NSLog(@"NSStreamEventHasSpaceAvailable");
             
         }
             break;

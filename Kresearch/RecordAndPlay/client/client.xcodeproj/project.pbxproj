@@ -60,13 +60,13 @@
 			children = (
 				FD43DFE32004B91E00362288 /* AppDelegate.h */,
 				FD43DFE42004B91E00362288 /* AppDelegate.m */,
-				FD43DFE62004B91E00362288 /* ViewController.h */,
 				FD43DFE72004B91E00362288 /* ViewController.m */,
 				FD43DFE92004B91E00362288 /* Main.storyboard */,
 				FD43DFEC2004B91E00362288 /* Assets.xcassets */,
 				FD43DFEE2004B91E00362288 /* LaunchScreen.storyboard */,
 				FD43DFF12004B91E00362288 /* Info.plist */,
 				FD43DFF22004B91E00362288 /* main.m */,
+				FD43DFE62004B91E00362288 /* ViewController.h */,
 			);
 			path = client;
 			sourceTree = "<group>";
