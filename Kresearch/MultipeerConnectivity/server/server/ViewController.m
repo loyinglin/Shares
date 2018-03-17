@@ -7,18 +7,8 @@
 //
 
 #import "ViewController.h"
+#import "ProtocolType.h"
 #import <MultipeerConnectivity/MultipeerConnectivity.h>
-
-
-typedef NS_ENUM(int32_t, ProtocolType) {
-    ProtocolTypeNone = 0,
-    ProtocolTypeDelay = 10, // A向B发送一条消息，B立刻返回，A接受到返回的消息，计算两次消息的延迟；
-    ProtocolTypeDelayReq = 11,
-    ProtocolTypeDelayRsp = 12,
-    
-    
-    ProtocolTypeBps = 20, // A向B发送一条start消息，然后是10M数据，最后是一条end消息；B计算start到end消息直接的收包时间；
-};
 
 
 @interface ViewController () <MCSessionDelegate, MCAdvertiserAssistantDelegate, MCBrowserViewControllerDelegate, NSStreamDelegate>
@@ -31,14 +21,11 @@ typedef NS_ENUM(int32_t, ProtocolType) {
 @property (nonatomic, strong) NSOutputStream *mOutputStream;
 
 @property (nonatomic, assign) int mProtocolType;
+@property (nonatomic, assign) int mDelayCount;
+@property (nonatomic, assign) float mAverageDelayTime;
 @property (nonatomic, strong) NSDate *mDelayStartDate;
 
-@property (nonatomic, assign) int count;
-@property (nonatomic, assign) NSTimeInterval averageDelayTime;
-
 @end
-
-const int port = 51515;
 
 @implementation ViewController
 
@@ -67,17 +54,17 @@ const int port = 51515;
     [self.view addSubview:showBtn];
     
     UIButton *sendBtn = [UIButton buttonWithType:UIButtonTypeSystem];
-    [sendBtn setTitle:@"send data" forState:UIControlStateNormal];
+    [sendBtn setTitle:@"start delay test" forState:UIControlStateNormal];
     [sendBtn sizeToFit];
     sendBtn.center = CGPointMake(200, 250);
-    [sendBtn addTarget:self action:@selector(sendData) forControlEvents:UIControlEventTouchUpInside];
+    [sendBtn addTarget:self action:@selector(startDelayTest) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:sendBtn];
     
     UIButton *delayBtn = [UIButton buttonWithType:UIButtonTypeSystem];
-    [delayBtn setTitle:@"start delay test" forState:UIControlStateNormal];
+    [delayBtn setTitle:@"start auto delay test" forState:UIControlStateNormal];
     [delayBtn sizeToFit];
     delayBtn.center = CGPointMake(200, 300);
-    [delayBtn addTarget:self action:@selector(startDelayTest) forControlEvents:UIControlEventTouchUpInside];
+    [delayBtn addTarget:self action:@selector(startAutoDelayTest) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:delayBtn];
     
     // mc
@@ -91,38 +78,37 @@ const int port = 51515;
 
 #pragma mark - MCSessionDelegate
 
-// Remote peer changed state.
 - (void)session:(MCSession *)session peer:(MCPeerID *)peerID didChangeState:(MCSessionState)state {
     if (session == self.mSession) {
-        NSLog(@"id%@, changeState to:%ld ", peerID.displayName, state);
+        NSString *str;
         switch (state) {
             case MCSessionStateConnected:
-                NSLog(@"连接成功.");
+                str = @"连接成功.";
                 break;
             case MCSessionStateConnecting:
-                NSLog(@"正在连接...");
+                str = @"正在连接...";
                 break;
             default:
-                NSLog(@"连接失败.");
+                str = @"连接失败.";
+                self.mOutputStream = nil;
                 break;
         }
+        NSLog(@"id%@, changeState to:%@", peerID.displayName, str);
     }
 }
 
-// Received data from remote peer.
 - (void)session:(MCSession *)session didReceiveData:(NSData *)data fromPeer:(MCPeerID *)peerID {
     if (self.mSession == session) {
-        NSLog(@"didReceiveData:%@ from id:%@", [data description], peerID.displayName);
+        NSLog(@"didReceiveData:%@ from id:%@", data, peerID.displayName);
     }
 }
 
-// Received a byte stream from remote peer.
 - (void)    session:(MCSession *)session
    didReceiveStream:(NSInputStream *)stream
            withName:(NSString *)streamName
            fromPeer:(MCPeerID *)peerID {
     if (self.mSession == session) {
-        NSLog(@"didReceiveStream:%@, named:%@ from id:%@", [stream description], streamName, peerID.displayName);
+        NSLog(@"didReceiveInputStream:%@, named:%@ from id:%@", stream, streamName, peerID.displayName);
         
         if (self.mInputStream) {
             [self.mInputStream close];
@@ -134,7 +120,6 @@ const int port = 51515;
     }
 }
 
-// Start receiving a resource from remote peer.
 - (void)                    session:(MCSession *)session
   didStartReceivingResourceWithName:(NSString *)resourceName
                            fromPeer:(MCPeerID *)peerID
@@ -144,14 +129,11 @@ const int port = 51515;
     }
 }
 
-// Finished receiving a resource from remote peer and saved the content
-// in a temporary location - the app is responsible for moving the file
-// to a permanent location within its sandbox.
 - (void)                    session:(MCSession *)session
  didFinishReceivingResourceWithName:(NSString *)resourceName
                            fromPeer:(MCPeerID *)peerID
                               atURL:(nullable NSURL *)localURL
-                          withError:(nullable NSError *)error {
+                          withError:(nullable NSError *)error { // 收到文件，必须把文件从url对应的位置，复制到APP的沙盒中
     
     if (self.mSession == session) {
         NSLog(@"didFinishReceivingResourceWithName:%@ from id:%@, localUrl:%@, error:%@", resourceName, peerID.displayName, localURL.absoluteString, [error description]);
@@ -159,27 +141,23 @@ const int port = 51515;
 }
 
 #pragma mark - MCAdvertiserAssistantDelegate
-// An invitation will be presented to the user.
 - (void)advertiserAssistantWillPresentInvitation:(MCAdvertiserAssistant *)advertiserAssistant {
     NSLog(@"advertiserAssistantWillPresentInvitation");
 }
 
-// An invitation was dismissed from screen.
 - (void)advertiserAssistantDidDismissInvitation:(MCAdvertiserAssistant *)advertiserAssistant {
     NSLog(@"advertiserAssistantDidDismissInvitation");
 }
 
 
 #pragma mark - MCBrowserViewControllerDelegate
-// Notifies the delegate, when the user taps the done button.
 - (void)browserViewControllerDidFinish:(MCBrowserViewController *)browserViewController {
-    NSLog(@"已选择");
+    NSLog(@"browserViewControllerDidFinish 已选择");
     [self.mBrowserVC dismissViewControllerAnimated:YES completion:nil];
 }
 
-// Notifies delegate that the user taps the cancel button.
 - (void)browserViewControllerWasCancelled:(MCBrowserViewController *)browserViewController {
-    NSLog(@"取消.");
+    NSLog(@"browserViewControllerWasCancelled 取消.");
     [self.mBrowserVC dismissViewControllerAnimated:YES completion:nil];
 }
 
@@ -200,40 +178,34 @@ const int port = 51515;
  */
 - (void)stream:(NSStream *)aStream handleEvent:(NSStreamEvent)eventCode {
     switch (eventCode) {
-        case NSStreamEventOpenCompleted:{ //打开输出数据流通道或者打开输入数据流通道就会走到这一步
+        case NSStreamEventOpenCompleted:{
             NSLog(@"NSStreamEventOpenCompleted");
         }
             break;
-        case NSStreamEventHasBytesAvailable:{//监测到输入流通道中有数据流，就把数据一点一点的拼接起来
+        case NSStreamEventHasBytesAvailable:{
             NSLog(@"NSStreamEventHasBytesAvailable");
             if (aStream == self.mInputStream) {
-                ProtocolType type = 0;
-                uint8_t buffer[1024] = {0};
-                int num = (int)[self.mInputStream read:buffer maxLength:4];
-                NSLog(@"read %d", num);
-                type = *(int32_t *)buffer;
-                NSLog(@"type %d", type);
-                [self handleProtocolWithType:type data:NULL];
+                [self onInputDataReady];
             }
             break;
         }
-        case NSStreamEventHasSpaceAvailable: {//监测到有内存空间可用，就把输出流通道中的流写入到内存空间
+        case NSStreamEventHasSpaceAvailable: {
             NSLog(@"NSStreamEventHasSpaceAvailable");
-//            if (self.mOutputStream == aStream) {
-//                if (self.mProtocolType == ProtocolTypeDelay) {
-//                    self.mProtocolType = ProtocolTypeNone;
-//                    int32_t type = ProtocolTypeDelayReq;
-//                    [self.mOutputStream write:(uint8_t *)&type maxLength:4];
-//                }
-//            }
         }
             break;
-        case NSStreamEventEndEncountered: { //监测到输出流通道中的流数据写入内存空间完成或者输入流通道中的流数据获取完成
+        case NSStreamEventEndEncountered: {
             NSLog(@"NSStreamEventEndEncountered");
+            if (aStream == self.mInputStream) {
+                self.mInputStream = nil;
+            }
+            if (aStream == self.mOutputStream) {
+                self.mOutputStream = nil;
+            }
+            [aStream close];//关闭输出流
+            [aStream removeFromRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];//将输出流从runloop中清除
             break;
         }
         case NSStreamEventErrorOccurred:{
-            //发生错误
             NSLog(@"NSStreamEventErrorOccurred");
             if (aStream == self.mInputStream) {
                 self.mInputStream = nil;
@@ -252,16 +224,6 @@ const int port = 51515;
     }
 }
 
-- (void)handleProtocolWithType:(ProtocolType)type data:(char *)data {
-    if (type == ProtocolTypeDelayRsp || YES) {
-        NSDate *rspDate = [ NSDate dateWithTimeIntervalSinceNow:0];
-        NSTimeInterval delay = [rspDate timeIntervalSinceDate:self.mDelayStartDate];
-        self.averageDelayTime += delay * 1000;
-        ++self.count;
-        NSLog(@"delay test with %.2lfms,  average delay time:%.2lfms", delay * 1000, self.averageDelayTime / (self.count > 0 ? self.count : 1));
-        
-    }
-}
 #pragma mark - ui
 - (void)startServer {
     [self.mAdvertiserAssistant start];
@@ -275,40 +237,52 @@ const int port = 51515;
     [self presentViewController:self.mBrowserVC animated:YES completion:nil];
 }
 
-- (void)sendData {
-    NSString *path = [[NSBundle mainBundle] pathForResource:@"chenli" ofType:@"mp3"];
-    NSData *data = [NSData dataWithContentsOfFile:path options:NSDataReadingUncached error:nil];
-    if (self.mSession.connectedPeers && self.mSession.connectedPeers.count > 0) {
-        [self.mSession sendData:data toPeers:self.mSession.connectedPeers withMode:MCSessionSendDataUnreliable error:nil];
-    }
-}
 
 - (void)startDelayTest {
-    self.mDelayStartDate = [NSDate dateWithTimeIntervalSinceNow:0];
-    
     if (!self.mOutputStream) {
         self.mOutputStream = [self.mSession startStreamWithName:@"delayTestServer" toPeer:[self.mSession.connectedPeers firstObject] error:nil];
         self.mOutputStream.delegate = self;
         [self.mOutputStream scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
-        self.mProtocolType = ProtocolTypeDelay;
         [self.mOutputStream open];
     }
 
     int32_t type = ProtocolTypeDelayReq;
+    self.mDelayStartDate = [NSDate dateWithTimeIntervalSinceNow:0];
     [self.mOutputStream write:(uint8_t *)&type maxLength:4];
 
-    
-//    if (self.count < 100) {
-//        self.count++;
-//        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-//            [self startDelayTest];
-//        });
-//    }
-//    else {
-//        self.count = 0;
-//        self.averageDelayTime = 0;
-//    }
 }
 
+- (void)startAutoDelayTest {
+    static int autoTestCount = 0;
+    [self startDelayTest];
+    
+    if (autoTestCount < 10) {
+        autoTestCount++;
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self startAutoDelayTest];
+        });
+    }
+    else {
+        autoTestCount = 0;
+    }
+}
+
+#pragma mark - data process
+
+- (void)onInputDataReady {
+    ProtocolType type = 0;
+    [self.mInputStream read:(unsigned char *)&type maxLength:sizeof(type)];
+    [self handleProtocolWithType:type];
+}
+
+- (void)handleProtocolWithType:(ProtocolType)type {
+    if (type == ProtocolTypeDelayRsp) {
+        NSDate *rspDate = [ NSDate dateWithTimeIntervalSinceNow:0];
+        NSTimeInterval delay = [rspDate timeIntervalSinceDate:self.mDelayStartDate];
+        self.mAverageDelayTime += delay * 1000;
+        ++self.mDelayCount;
+        NSLog(@"delay test with %.2lfms,  average delay time:%.2lfms", delay * 1000, self.mAverageDelayTime / self.mDelayCount);
+    }
+}
 
 @end

@@ -26,6 +26,7 @@
 		FD43DFEF2004B91E00362288 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		FD43DFF12004B91E00362288 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FD43DFF22004B91E00362288 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		FD6E8BBD205D3686007769A3 /* ProtocolType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProtocolType.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +59,7 @@
 		FD43DFE22004B91E00362288 /* client */ = {
 			isa = PBXGroup;
 			children = (
+				FD6E8BBC205D3686007769A3 /* common */,
 				FD43DFE32004B91E00362288 /* AppDelegate.h */,
 				FD43DFE42004B91E00362288 /* AppDelegate.m */,
 				FD43DFE62004B91E00362288 /* ViewController.h */,
@@ -69,6 +71,15 @@
 				FD43DFF22004B91E00362288 /* main.m */,
 			);
 			path = client;
+			sourceTree = "<group>";
+		};
+		FD6E8BBC205D3686007769A3 /* common */ = {
+			isa = PBXGroup;
+			children = (
+				FD6E8BBD205D3686007769A3 /* ProtocolType.h */,
+			);
+			name = common;
+			path = ../../common;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

@@ -13,7 +13,6 @@
 		FD54826320046344005B252F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FD54826220046344005B252F /* Assets.xcassets */; };
 		FD54826620046344005B252F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FD54826420046344005B252F /* LaunchScreen.storyboard */; };
 		FD54826920046344005B252F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = FD54826820046344005B252F /* main.m */; };
-		FD5482702004637B005B252F /* chenli.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = FD54826F2004637B005B252F /* chenli.mp3 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,7 +26,7 @@
 		FD54826520046344005B252F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		FD54826720046344005B252F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FD54826820046344005B252F /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		FD54826F2004637B005B252F /* chenli.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = chenli.mp3; sourceTree = "<group>"; };
+		FD6E8BBB205D2B6E007769A3 /* ProtocolType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProtocolType.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,7 +59,7 @@
 		FD54825820046344005B252F /* server */ = {
 			isa = PBXGroup;
 			children = (
-				FD54826F2004637B005B252F /* chenli.mp3 */,
+				FD6E8BBA205D2B6E007769A3 /* common */,
 				FD54825920046344005B252F /* AppDelegate.h */,
 				FD54825A20046344005B252F /* AppDelegate.m */,
 				FD54825C20046344005B252F /* ViewController.h */,
@@ -72,6 +71,15 @@
 				FD54826820046344005B252F /* main.m */,
 			);
 			path = server;
+			sourceTree = "<group>";
+		};
+		FD6E8BBA205D2B6E007769A3 /* common */ = {
+			isa = PBXGroup;
+			children = (
+				FD6E8BBB205D2B6E007769A3 /* ProtocolType.h */,
+			);
+			name = common;
+			path = ../../common;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -135,7 +143,6 @@
 				FD54826620046344005B252F /* LaunchScreen.storyboard in Resources */,
 				FD54826320046344005B252F /* Assets.xcassets in Resources */,
 				FD54826120046344005B252F /* Main.storyboard in Resources */,
-				FD5482702004637B005B252F /* chenli.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -285,6 +292,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 6X5L546LN9;
 				INFOPLIST_FILE = server/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = loying.server;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -299,6 +307,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 6X5L546LN9;
 				INFOPLIST_FILE = server/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = loying.server;
 				PRODUCT_NAME = "$(TARGET_NAME)";
