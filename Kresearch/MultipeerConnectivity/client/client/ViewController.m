@@ -37,7 +37,7 @@
     [btn setTitle:@"start" forState:UIControlStateNormal];
     [btn sizeToFit];
     btn.center = CGPointMake(200, 150);
-    [btn addTarget:self action:@selector(startServer) forControlEvents:UIControlEventTouchUpInside];
+    [btn addTarget:self action:@selector(startClient) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:btn];
     
     MCPeerID *peerId = [[MCPeerID alloc] initWithDisplayName:@"client"];
@@ -84,6 +84,15 @@
         self.mInputStream.delegate = self;
         [self.mInputStream scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
         [self.mInputStream open];
+        
+        
+        if (self.mOutputStream) {
+            [self.mOutputStream close];
+        }
+        self.mOutputStream = [self.mSession startStreamWithName:@"delayTestClient" toPeer:[self.mSession.connectedPeers firstObject] error:nil];
+        self.mOutputStream.delegate = self;
+        [self.mOutputStream scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
+        [self.mOutputStream open];
     }
 }
 
@@ -179,13 +188,12 @@
 
 #pragma mark - ui
 
-- (void)startServer {
+- (void)startClient {
     if (!self.mBrowserVC) {
         self.mBrowserVC = [[MCBrowserViewController alloc] initWithServiceType:@"connect" session:self.mSession];
         self.mBrowserVC.delegate = self;
     }
     [self presentViewController:self.mBrowserVC animated:YES completion:nil];
-    
 }
 
 #pragma mark - data process
@@ -197,12 +205,6 @@
 }
 
 - (void)handleProtocolWithType:(ProtocolType)type {
-    if (!self.mOutputStream) {
-        self.mOutputStream = [self.mSession startStreamWithName:@"delayTestClient" toPeer:[self.mSession.connectedPeers firstObject] error:nil];
-        self.mOutputStream.delegate = self;
-        [self.mOutputStream scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
-        [self.mOutputStream open];
-    }
     if (type == ProtocolTypeDelayReq) {
         int32_t type = ProtocolTypeDelayRsp;
         [self.mOutputStream write:(uint8_t *)&type maxLength:4];

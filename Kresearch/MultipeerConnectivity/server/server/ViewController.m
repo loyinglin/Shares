@@ -15,7 +15,6 @@
 
 @property (nonatomic, strong) MCSession *mSession;
 @property (nonatomic, strong) MCAdvertiserAssistant *mAdvertiserAssistant;
-@property (nonatomic, strong) MCBrowserViewController *mBrowserVC;
 
 @property (nonatomic, strong) NSInputStream *mInputStream;
 @property (nonatomic, strong) NSOutputStream *mOutputStream;
@@ -47,10 +46,10 @@
     [self.view addSubview:btn];
     
     UIButton *showBtn = [UIButton buttonWithType:UIButtonTypeSystem];
-    [showBtn setTitle:@"show nearby" forState:UIControlStateNormal];
+    [showBtn setTitle:@"start stream" forState:UIControlStateNormal];
     [showBtn sizeToFit];
     showBtn.center = CGPointMake(200, 200);
-    [showBtn addTarget:self action:@selector(showNearbyPeer) forControlEvents:UIControlEventTouchUpInside];
+    [showBtn addTarget:self action:@selector(startOutputStream) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:showBtn];
     
     UIButton *sendBtn = [UIButton buttonWithType:UIButtonTypeSystem];
@@ -149,26 +148,6 @@
     NSLog(@"advertiserAssistantDidDismissInvitation");
 }
 
-
-#pragma mark - MCBrowserViewControllerDelegate
-- (void)browserViewControllerDidFinish:(MCBrowserViewController *)browserViewController {
-    NSLog(@"browserViewControllerDidFinish 已选择");
-    [self.mBrowserVC dismissViewControllerAnimated:YES completion:nil];
-}
-
-- (void)browserViewControllerWasCancelled:(MCBrowserViewController *)browserViewController {
-    NSLog(@"browserViewControllerWasCancelled 取消.");
-    [self.mBrowserVC dismissViewControllerAnimated:YES completion:nil];
-}
-
-
-- (BOOL)browserViewController:(MCBrowserViewController *)browserViewController
-      shouldPresentNearbyPeer:(MCPeerID *)peerID
-            withDiscoveryInfo:(nullable NSDictionary<NSString *, NSString *> *)info{
-    NSLog(@"shouldPresentNearbyPeer:%@", peerID.displayName);
-    return YES;
-}
-
 #pragma mark -- NSStreamDelegate
 /**
  *  流数据操作
@@ -229,27 +208,19 @@
     [self.mAdvertiserAssistant start];
 }
 
-- (void)showNearbyPeer {
-    if (!self.mBrowserVC) {
-        self.mBrowserVC = [[MCBrowserViewController alloc] initWithServiceType:@"connect" session:self.mSession];
-        self.mBrowserVC.delegate = self;
-    }
-    [self presentViewController:self.mBrowserVC animated:YES completion:nil];
-}
-
-
-- (void)startDelayTest {
+- (void)startOutputStream {
     if (!self.mOutputStream) {
         self.mOutputStream = [self.mSession startStreamWithName:@"delayTestServer" toPeer:[self.mSession.connectedPeers firstObject] error:nil];
         self.mOutputStream.delegate = self;
         [self.mOutputStream scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
         [self.mOutputStream open];
     }
+}
 
+- (void)startDelayTest {
     int32_t type = ProtocolTypeDelayReq;
     self.mDelayStartDate = [NSDate dateWithTimeIntervalSinceNow:0];
     [self.mOutputStream write:(uint8_t *)&type maxLength:4];
-
 }
 
 - (void)startAutoDelayTest {
