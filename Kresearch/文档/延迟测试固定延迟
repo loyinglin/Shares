@@ -1,0 +1,72 @@
+7p（iOS 11）-6p（iOS 10）
+2018-03-06 19:40:11.679174+0800 server[9119:2808530] delay test with 44.31ms,  average delay time:44.31ms
+2018-03-06 19:40:15.346087+0800 server[9119:2808530] delay test with 12.17ms,  average delay time:28.24ms
+2018-03-06 19:40:16.378231+0800 server[9119:2808530] delay test with 209.45ms,  average delay time:88.64ms
+2018-03-06 19:40:17.432863+0800 server[9119:2808530] delay test with 247.03ms,  average delay time:128.24ms
+2018-03-06 19:40:18.469221+0800 server[9119:2808530] delay test with 164.07ms,  average delay time:135.41ms
+2018-03-06 19:40:19.521620+0800 server[9119:2808530] delay test with 102.08ms,  average delay time:129.85ms
+2018-03-06 19:40:20.207764+0800 server[9119:2808530] delay test with 21.52ms,  average delay time:114.38ms
+2018-03-06 19:40:21.090444+0800 server[9119:2808530] delay test with 187.92ms,  average delay time:123.57ms
+2018-03-06 19:40:21.653051+0800 server[9119:2808530] delay test with 16.30ms,  average delay time:111.65ms
+2018-03-06 19:40:22.245038+0800 server[9119:2808530] delay test with 9.73ms,  average delay time:101.46ms
+2018-03-06 19:40:23.190842+0800 server[9119:2808530] delay test with 271.15ms,  average delay time:116.89ms
+2018-03-06 19:40:23.713898+0800 server[9119:2808530] delay test with 76.51ms,  average delay time:113.52ms
+2018-03-06 19:40:30.538648+0800 server[9119:2808530] delay test with 16.81ms,  average delay time:106.08ms
+2018-03-06 19:40:32.623444+0800 server[9119:2808530] delay test with 71.33ms,  average delay time:103.60ms
+2018-03-06 19:40:33.779779+0800 server[9119:2808530] delay test with 9.58ms,  average delay time:97.33ms
+2018-03-06 19:40:35.250257+0800 server[9119:2808530] delay test with 347.24ms,  average delay time:112.95ms
+2018-03-06 19:40:35.772657+0800 server[9119:2808530] delay test with 269.53ms,  average delay time:122.16ms
+2018-03-06 19:40:36.313296+0800 server[9119:2808530] delay test with 172.76ms,  average delay time:124.97ms
+2018-03-06 19:40:36.820780+0800 server[9119:2808530] delay test with 217.24ms,  average delay time:129.83ms
+2018-03-06 19:40:37.344523+0800 server[9119:2808530] delay test with 291.00ms,  average delay time:137.89ms
+2018-03-06 19:40:37.866202+0800 server[9119:2808530] delay test with 206.68ms,  average delay time:141.16ms
+2018-03-06 19:40:38.395904+0800 server[9119:2808530] delay test with 60.75ms,  average delay time:137.51ms
+2018-03-06 19:40:38.914436+0800 server[9119:2808530] delay test with 24.53ms,  average delay time:132.60ms
+2018-03-06 19:40:39.504228+0800 server[9119:2808530] delay test with 29.32ms,  average delay time:128.29ms
+2018-03-06 19:40:40.031295+0800 server[9119:2808530] delay test with 10.68ms,  average delay time:123.59ms
+2018-03-06 19:40:40.560057+0800 server[9119:2808530] delay test with 19.39ms,  average delay time:119.58ms
+2018-03-06 19:40:41.055745+0800 server[9119:2808530] delay test with 11.46ms,  average delay time:115.58ms
+2018-03-06 19:40:41.606937+0800 server[9119:2808530] delay test with 19.56ms,  average delay time:112.15ms
+2018-03-06 19:40:42.130924+0800 server[9119:2808530] delay test with 20.55ms,  average delay time:108.99ms
+2018-03-06 19:40:44.683641+0800 server[9119:2808530] delay test with 161.26ms,  average delay time:110.73ms
+2018-03-06 19:40:45.212289+0800 server[9119:2808530] delay test with 224.09ms,  average delay time:114.39ms
+
+这是往返发送1024bytes的延迟情况。
+综合上面的数据，单向每次延迟在57ms。
+
+
+
+
+
+6p（iOS 10）-6（iOS 10）
+2018-03-06 19:57:49.700539+0800 server[1187:290402] delay test with 12.21ms,  average delay time:18.53ms
+2018-03-06 19:57:49.847092+0800 server[1187:290402] delay test with 8.73ms,  average delay time:18.45ms
+2018-03-06 19:57:49.980242+0800 server[1187:290402] delay test with 8.65ms,  average delay time:18.37ms
+2018-03-06 19:57:50.114290+0800 server[1187:290402] delay test with 9.40ms,  average delay time:18.30ms
+2018-03-06 19:57:50.271820+0800 server[1187:290402] delay test with 15.06ms,  average delay time:18.28ms
+2018-03-06 19:57:50.398002+0800 server[1187:290402] delay test with 9.44ms,  average delay time:18.21ms
+2018-03-06 19:57:50.529703+0800 server[1187:290402] delay test with 8.10ms,  average delay time:18.13ms
+2018-03-06 19:57:50.664606+0800 server[1187:290402] delay test with 9.54ms,  average delay time:18.07ms
+2018-03-06 19:57:50.781467+0800 server[1187:290402] delay test with 9.82ms,  average delay time:18.00ms
+2018-03-06 19:57:53.342064+0800 server[1187:290402] delay test with 53.36ms,  average delay time:18.27ms
+2018-03-06 19:57:53.346048+0800 server[1187:290402] delay test with 57.35ms,  average delay time:18.56ms
+2018-03-06 19:57:53.471749+0800 server[1187:290402] delay test with 16.39ms,  average delay time:18.55ms
+2018-03-06 19:57:53.613934+0800 server[1187:290402] delay test with 8.52ms,  average delay time:18.47ms
+2018-03-06 19:57:53.787955+0800 server[1187:290402] delay test with 14.52ms,  average delay time:18.44ms
+2018-03-06 19:57:53.947163+0800 server[1187:290402] delay test with 8.52ms,  average delay time:18.37ms
+2018-03-06 19:57:54.098614+0800 server[1187:290402] delay test with 9.74ms,  average delay time:18.31ms
+2018-03-06 19:57:54.287998+0800 server[1187:290402] delay test with 14.47ms,  average delay time:18.28ms
+2018-03-06 19:57:54.437186+0800 server[1187:290402] delay test with 14.07ms,  average delay time:18.25ms
+2018-03-06 19:57:54.614246+0800 server[1187:290402] delay test with 8.75ms,  average delay time:18.18ms
+2018-03-06 19:57:54.788798+0800 server[1187:290402] delay test with 14.83ms,  average delay time:18.16ms
+2018-03-06 19:57:54.954612+0800 server[1187:290402] delay test with 15.54ms,  average delay time:18.14ms
+2018-03-06 19:57:55.117579+0800 server[1187:290402] delay test with 12.08ms,  average delay time:18.10ms
+2018-03-06 19:57:55.281596+0800 server[1187:290402] delay test with 9.46ms,  average delay time:18.04ms
+2018-03-06 19:57:55.458515+0800 server[1187:290402] delay test with 18.19ms,  average delay time:18.04ms
+2018-03-06 19:57:55.614526+0800 server[1187:290402] delay test with 8.76ms,  average delay time:17.98ms
+2018-03-06 19:57:55.782351+0800 server[1187:290402] delay test with 10.01ms,  average delay time:17.93ms
+2018-03-06 19:57:55.954789+0800 server[1187:290402] delay test with 15.78ms,  average delay time:17.91ms
+2018-03-06 19:57:56.263932+0800 server[1187:290402] delay test with 24.89ms,  average delay time:17.96ms
+2018-03-06 19:57:56.454798+0800 server[1187:290402] delay test with 15.79ms,  average delay time:17.94ms
+
+同系统明显快很多。

@@ -1,0 +1,187 @@
+[2018-02-06 11:15:40.484][:0][[M:UI][KS:INFO]###Multipeer### checkReady
+[2018-02-06 11:15:40.484][:0][[M:UI][KS:INFO]###Multipeer### ready but wait
+[2018-02-06 11:15:40.537][:0][[M:UI][KS:INFO]###Multipeer### mCallback
+
+
+
+
+/**
+ 两次握手：（假设A先创建output流）
+ A新建output流，并且发送给B，A->B; (A.output ready)
+ B收到A的output流，保存为自己的input流；(B.input ready)
+ 
+ B创建input流，并发送给A，B->A; (B.output ready，B的input和output均就绪，此时启动录歌）
+ A收到B的input流，保存为自己的input流；（A.input ready，A的input和output均就绪，此时启动录歌）
+ */
+
+
+
+
+-----------test1
+6-Client 6P-Server-first  no delay 
+
+6-log
+创建output流
+[2018-02-06 11:27:15.789][:0][[M:UI][KS:INFO]###Multipeer### requestConnectStreamWithBlock
+(注意这里耗时竟然有11ms)
+检查是否已满足启动条件
+[2018-02-06 11:27:15.790][:0][[M:UI][KS:INFO]###Multipeer### checkReady
+[2018-02-06 11:27:15.790][:0][[M:UI][KS:INFO]###Multipeer### mCallback
+第一次audioUnit 回调
+[2018-02-06 11:27:16.942][:0][[M:UI][KS:INFO]###Multipeer### onRecordDataWithBuffer mOutputCircleBuffer writeWithBuffer: 1024 bytes, ready: 1024
+[2018-02-06 11:27:16.942][:0][[M:UI][KS:INFO]###Multipeer### onRequestDataWithBuffer mInputCircleBuffer readWithBuffer, 0 bytes, ready: 0
+第一次发送数据
+[2018-02-06 11:27:16.949][:0][[M:UI][KS:INFO]###Multipeer### requestMultipeerSendData send: 1024 bytes, ready: 0
+第一次收到数据
+[2018-02-06 11:27:17.207][:0][[M:UI][KS:INFO]###Multipeer### requestMultipeerRevData recieve: 2048 bytes, ready:2048
+
+
+
+6p-log
+创建output流
+[2018-02-06 11:27:13.057][:0][[M:UI][KS:INFO]###Multipeer### requestConnectStreamWithBlock
+(注意这里耗时为0ms)
+检查是否已满足启动条件
+[2018-02-06 11:27:13.057][:0][[M:UI][KS:INFO]###Multipeer### checkReady
+收到input流
+[2018-02-06 11:27:15.795][:0][[M:UI][KS:INFO]###Multipeer### didReceiveStream:<__NSCFInputStream: 0x170113f80>, named:client output from id:client:79852347
+检查是否已满足启动条件
+[2018-02-06 11:27:15.795][:0][[M:UI][KS:INFO]###Multipeer### checkReady
+[2018-02-06 11:27:15.795][:0][[M:UI][KS:INFO]###Multipeer### mCallback
+[2018-02-06 11:27:15.795][:0][[M:UI][KS:INFO]###Multipeer### requestConnectStreamWithBlock, callback, startRecording
+第一次audioUnit 回调
+[2018-02-06 11:27:16.984][:0][[M:UI][KS:INFO]###Multipeer### onRecordDataWithBuffer mOutputCircleBuffer writeWithBuffer: 1024 bytes, ready: 1024
+[2018-02-06 11:27:16.984][:0][[M:UI][KS:INFO]###Multipeer### onRequestDataWithBuffer mInputCircleBuffer readWithBuffer, 0 bytes, ready: 0
+第一次发送数据
+[2018-02-06 11:27:16.989][:0][[M:UI][KS:INFO]###Multipeer### requestMultipeerSendData send: 1024 bytes, ready: 0
+第一次收到数据
+[2018-02-06 11:27:17.210][:0][[M:UI][KS:INFO]###Multipeer### requestMultipeerRevData recieve: 1024 bytes, ready:1024
+
+
+-----------test2
+6-Client 6P-Server-first  no delay 
+
+6-log
+收到input流
+[2018-02-06 12:59:25.352][:0][[M:UI][KS:INFO]###Multipeer### didReceiveStream:<__NSCFInputStream: 0x17410d770>, named:server output from id:server:390949861
+检查是否已满足启动条件
+[2018-02-06 12:59:25.354][:0][[M:UI][KS:INFO]###Multipeer### checkReady
+创建output流
+[2018-02-06 12:59:28.758][:0][[M:UI][KS:INFO]###Multipeer### requestConnectStreamWithBlock
+检查是否已满足启动条件
+[2018-02-06 12:59:28.759][:0][[M:UI][KS:INFO]###Multipeer### checkReady
+[2018-02-06 12:59:28.759][:0][[M:UI][KS:INFO]###Multipeer### mCallback
+[2018-02-06 12:59:28.759][:0][[M:UI][KS:INFO]###Multipeer### requestConnectStreamWithBlock, callback, startRecording
+第一次audioUnit 回调
+[2018-02-06 12:59:29.795][:0][[M:UI][KS:INFO]###Multipeer### onRecordDataWithBuffer mOutputCircleBuffer writeWithBuffer: 1024 bytes, ready: 1024
+[2018-02-06 12:59:29.795][:0][[M:UI][KS:INFO]###Multipeer### onRequestDataWithBuffer mInputCircleBuffer readWithBuffer, 0 bytes, ready: 0
+第一次发送数据
+[2018-02-06 12:59:29.802][:0][[M:UI][KS:INFO]###Multipeer### requestMultipeerSendData send: 1024 bytes, ready: 0
+
+
+6p-log 
+创建output流
+[2018-02-06 12:59:25.364][:0][[M:UI][KS:INFO]###Multipeer### requestConnectStreamWithBlock
+检查是否已满足启动条件
+[2018-02-06 12:59:25.365][:0][[M:UI][KS:INFO]###Multipeer### checkReady
+收到input流
+[2018-02-06 12:59:29.044][:0][[M:UI][KS:INFO]###Multipeer### didReceiveStream:<__NSCFInputStream: 0x170109c60>, named:client output from id:client:79852347
+检查是否已满足启动条件
+[2018-02-06 12:59:29.045][:0][[M:UI][KS:INFO]###Multipeer### checkReady
+[2018-02-06 12:59:29.045][:0][[M:UI][KS:INFO]###Multipeer### mCallback
+[2018-02-06 12:59:29.045][:0][[M:UI][KS:INFO]###Multipeer### requestConnectStreamWithBlock, callback, startRecording
+第一次收到数据
+[2018-02-06 12:59:30.098][:0][[M:UI][KS:INFO]###Multipeer### requestMultipeerRevData recieve: 1024 bytes, ready:1024
+第一次audioUnit 回调
+[2018-02-06 12:59:30.139][:0][[M:UI][KS:INFO]###Multipeer### onRecordDataWithBuffer mOutputCircleBuffer writeWithBuffer: 1024 bytes, ready: 1024
+[2018-02-06 12:59:30.139][:0][[M:UI][KS:INFO]###Multipeer### onRequestDataWithBuffer mInputCircleBuffer readWithBuffer, 1024 bytes, ready: 9216
+第一次发送数据
+[2018-02-06 12:59:30.141][:0][[M:UI][KS:INFO]###Multipeer### requestMultipeerSendData send: 1024 bytes, ready: 0
+
+
+
+
+
+
+延迟综合计算
+7p-log
+34:53开始录歌
+[2018-03-06 17:34:53.816][:0][[M:UI][KS:INFO]###Multipeer### requestConnectStreamWithBlock, callback, startRecording
+第5s输出buffer缓存940bytes，输入buffer缓存8610bytes
+[2018-03-06 17:34:58.072][:0][[M:UI][KS:INFO]###Multipeer### onRecordDataWithBuffer mOutputCircleBuffer writeWithBuffer: 940 bytes, ready: 940
+[2018-03-06 17:34:58.072][:0][[M:UI][KS:INFO]###Multipeer### onRequestDataWithBuffer mInputCircleBuffer readWithBuffer, 940 bytes, ready: 8610
+
+第15s
+[2018-03-06 17:35:08.003][:0][[M:UI][KS:INFO]###Multipeer### onRecordDataWithBuffer mOutputCircleBuffer writeWithBuffer: 940 bytes, ready: 940
+[2018-03-06 17:35:08.004][:0][[M:UI][KS:INFO]###Multipeer### onRequestDataWithBuffer mInputCircleBuffer readWithBuffer, 940 bytes, ready: 8256
+
+第40s
+[2018-03-06 17:35:33.019][:0][[M:UI][KS:INFO]###Multipeer### onRecordDataWithBuffer mOutputCircleBuffer writeWithBuffer: 940 bytes, ready: 940
+[2018-03-06 17:35:33.019][:0][[M:UI][KS:INFO]###Multipeer### onRequestDataWithBuffer mInputCircleBuffer readWithBuffer, 940 bytes, ready: 8968
+
+第60s
+[2018-03-06 17:35:53.011][:0][[M:UI][KS:INFO]###Multipeer### onRecordDataWithBuffer mOutputCircleBuffer writeWithBuffer: 940 bytes, ready: 940
+[2018-03-06 17:35:53.011][:0][[M:UI][KS:INFO]###Multipeer### onRequestDataWithBuffer mInputCircleBuffer readWithBuffer, 940 bytes, ready: 6084
+
+第90s
+[2018-03-06 17:36:23.012][:0][[M:UI][KS:INFO]###Multipeer### onRecordDataWithBuffer mOutputCircleBuffer writeWithBuffer: 940 bytes, ready: 940
+[2018-03-06 17:36:23.012][:0][[M:UI][KS:INFO]###Multipeer### onRequestDataWithBuffer mInputCircleBuffer readWithBuffer, 940 bytes, ready: 8548
+
+
+
+
+6p-log
+34:53开始录歌
+[2018-03-06 17:34:53.792][:0][[M:UI][KS:INFO]###Multipeer### requestConnectStreamWithBlock, callback, startRecording
+第5s输出buffer缓存1024bytes，输入buffer缓存3320bytes
+[2018-03-06 17:34:58.071][:0][[M:UI][KS:INFO]###Multipeer### onRecordDataWithBuffer mOutputCircleBuffer writeWithBuffer: 1024 bytes, ready: 1024
+[2018-03-06 17:34:58.071][:0][[M:UI][KS:INFO]###Multipeer### onRequestDataWithBuffer mInputCircleBuffer readWithBuffer, 1024 bytes, ready: 3320
+
+第15s
+[2018-03-06 17:35:08.033][:0][[M:UI][KS:INFO]###Multipeer### onRecordDataWithBuffer mOutputCircleBuffer writeWithBuffer: 1024 bytes, ready: 1024
+[2018-03-06 17:35:08.033][:0][[M:UI][KS:INFO]###Multipeer### onRequestDataWithBuffer mInputCircleBuffer readWithBuffer, 1024 bytes, ready: 5174
+
+第40s
+[2018-03-06 17:35:33.010][:0][[M:UI][KS:INFO]###Multipeer### onRecordDataWithBuffer mOutputCircleBuffer writeWithBuffer: 1024 bytes, ready: 1024
+[2018-03-06 17:35:33.011][:0][[M:UI][KS:INFO]###Multipeer### onRequestDataWithBuffer mInputCircleBuffer readWithBuffer, 1024 bytes, ready: 6698
+
+第60s
+[2018-03-06 17:35:53.002][:0][[M:UI][KS:INFO]###Multipeer### onRecordDataWithBuffer mOutputCircleBuffer writeWithBuffer: 1024 bytes, ready: 1024
+[2018-03-06 17:35:53.002][:0][[M:UI][KS:INFO]###Multipeer### onRequestDataWithBuffer mInputCircleBuffer readWithBuffer, 1024 bytes, ready: 4072
+
+第90s
+[2018-03-06 17:36:23.002][:0][[M:UI][KS:INFO]###Multipeer### onRecordDataWithBuffer mOutputCircleBuffer writeWithBuffer: 1024 bytes, ready: 1024
+[2018-03-06 17:36:23.002][:0][[M:UI][KS:INFO]###Multipeer### onRequestDataWithBuffer mInputCircleBuffer readWithBuffer, 1024 bytes, ready: 8316
+
+
+数据堆积延迟计算
+第5s
+7p (8610+1024)/2/44100*1000=109ms
+6p (940+3320)/2/44100*1000=48ms
+
+15s
+7p (8256+1024)/2/44100*1000=105ms
+6p (940+5174)/2/44100*1000=69ms
+
+40s
+7p (8968+1024)/2/44100*1000=113ms
+6p (940+6698)/2/44100*1000=86ms
+
+60s
+7p (6084+1024)/2/44100*1000=80ms
+6p (940+4072)/2/44100*1000=56ms
+
+90s
+7p (8548+1024)/2/44100*1000=108ms
+6p (940+8316)/2/44100*1000=104ms
+
+总的数据堆积平均延迟
+7p (109+105+113+80+108)/5=103ms
+6p (48+69+86+56+104)/5=72ms
+
+
+
+
+
+
+
